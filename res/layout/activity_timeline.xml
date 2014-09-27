@@ -1,3 +1,23 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${relativePackage}.${activityClass}" >
+
+    <fragment
+        android:id="@+id/fragment_timeline"
+        android:name="com.dvictor.twitter.fragments.HomeTimelineFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        tools:layout="@layout/fragment_tweets_list" />
+
+</RelativeLayout>
+
+
 <!-- Original relative layout.
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,22 +28,17 @@
 </RelativeLayout>
 -->    
 
-<android.support.v4.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swipeContainer"
+<!--  Alternative
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-        
-    <ListView
-        android:id="@+id/lvTweets"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <fragment
+        android:id="@+id/fragment_timeline"
+        android:name="com.dvictor.twitter.fragments.TweetsListFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" >
-
-    </ListView>
-
-</android.support.v4.widget.SwipeRefreshLayout>    
+        android:layout_height="wrap_content" />
+</LinearLayout>
+-->
 
