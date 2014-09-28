@@ -4,12 +4,15 @@ import org.json.JSONObject;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dvictor.twitter.fragments.UserTimelineFragment;
 import com.dvictor.twitter.models.User;
 import com.dvictor.twitter.util.InternetStatus;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -23,11 +26,34 @@ public class ProfileActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		internetStatus = new InternetStatus(this);
-		loadProfile();
+		// Detect if they want us to load a specific user.
+		User optUser = (User) getIntent().getSerializableExtra("user"); // NULL if no other user.
+		loadProfile(optUser);
+		// Tell the fragment to load a specific user too.
+		// - Load dynamically so we can control the constructor to pass arguments to it.
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		UserTimelineFragment userTimeline = UserTimelineFragment.newInstance(optUser);
+		ft.replace(R.id.flProfileTimelineContainer, userTimeline);
+		ft.commit();
+		// - Otherwise we could have statically loaded and set info by a custom method.
+		//STATIC ALTERNATIVE: UserTimelineFragment userTimeline = (UserTimelineFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentUserTimeline);
+		//STATIC ALTERNATIVE: userTimeline.setCustomUser(optUser);
+		//STATIC ALTERNATIVE: move super.onCreate() to bottom.
 	}
 	
-	private void loadProfile(){
-		if(!internetStatus.isAvailable()){ // If no network, don't allow create tweet.
+	/**
+	 * Load the user profile.
+	 * @param optUser
+	 *          (Optional) Specofic user profile to load if not the current user.
+	 *          NULL: loads current user by default if none specified.
+	 */
+	private void loadProfile(User optUser){
+		// If we already have the user object, just display it.
+		if(optUser!=null){
+			// note: we don't need a network check because (1) we already have it, and (2) image url is probably cached if they already displayed it once.
+			populateProfileHeader(optUser);			
+		// Otherwise we'll have to look it up.
+		}else if(!internetStatus.isAvailable()){ // If no network, don't allow create tweet.
 			Toast.makeText(this, "Network Not Available!", Toast.LENGTH_SHORT).show();
 			loadProfileOffline();
 		}else{
@@ -37,7 +63,6 @@ public class ProfileActivity extends FragmentActivity {
 				public void onSuccess(JSONObject json) {
 					Log.d("json", "MyInfo JSON: "+json.toString());
 					User u = User.fromJSON(json);
-					getActionBar().setTitle("@"+u.getScreenName());
 					populateProfileHeader(u);
 				}
 				@Override
@@ -57,6 +82,8 @@ public class ProfileActivity extends FragmentActivity {
 	}
 	
 	private void populateProfileHeader(User u){
+		// Set action bar to this user.
+		getActionBar().setTitle("@"+u.getScreenName());
 		// Get access to our views.
 		TextView  tvRealName     = (TextView)  findViewById(R.id.tvRealName    );
 		TextView  tvTagline      = (TextView)  findViewById(R.id.tvTagline     );
@@ -78,4 +105,10 @@ public class ProfileActivity extends FragmentActivity {
 		//FUTURE: return true;
 		return false;
 	}
+
+	/** When the user click on a profile image in the tweet list. */
+	public void onProfileClick(View v){
+		// Do nothing.  These are only the images of the profile they are already viewing.  No need to re-show the same activity.
+	}
+	
 }

@@ -46,6 +46,8 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 		tvUserName.setText("@"+tweet.getUser().getScreenName());
 		tvTime.setText("("+getRelativeTimeAgo(tweet.getCreatedAt())+")");
 		tvBody.setText(tweet.getBody());
+		// Store the user into the image so that when they click on it, we can know which user to show profile.
+		ivProfileImage.setTag(tweet.getUser());
 		return v;
 	}
 	

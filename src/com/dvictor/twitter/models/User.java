@@ -80,5 +80,9 @@ public class User extends Model implements Serializable{
 	public int getFriendsCount() {
 		return friendsCount;
 	}
+	
+	public String toString(){
+		return realName+" ("+uid+")";
+	}
 
 }

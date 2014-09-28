@@ -48,9 +48,20 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(url, params, handler);
 	}
 
-	public void getUserTimeline(long lastItemId, AsyncHttpResponseHandler handler){
+	/**
+	 * Get the timeline for the specified user.
+	 * @param optUid
+	 *          (Optional) ID of the user you want to display timeline for.
+	 *          -1: defaults to current user.
+	 * @param lastItemId
+	 *          Last item ID retrieved (for endless scolling to continue).
+	 *          0: refresh from the beginning.
+	 * @param handler - callback handler to return results when they are ready.
+	 */
+	public void getUserTimeline(long optUid, long lastItemId, AsyncHttpResponseHandler handler){
 		String url = getApiUrl("statuses/user_timeline.json");
 		RequestParams params = new RequestParams();
+		if(optUid>-1) params.put("user_id", ""+optUid);
 		if(lastItemId>0) params.put("max_id",""+(lastItemId-1)); // Subtract 1 because max id will return results inclusive of that ID, and we only want the next older ones.  Use max & subtract because we are going for older IDs.
 		params.put("count","25");
 		client.get(url, params, handler);

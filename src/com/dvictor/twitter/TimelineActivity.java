@@ -1,8 +1,5 @@
 package com.dvictor.twitter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.content.Intent;
@@ -11,7 +8,6 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.dvictor.twitter.fragments.HomeTimelineFragment;
@@ -19,6 +15,7 @@ import com.dvictor.twitter.fragments.MentionsTimelineFragment;
 import com.dvictor.twitter.fragments.TweetsListFragment;
 import com.dvictor.twitter.listeners.FragmentTabListener;
 import com.dvictor.twitter.models.Tweet;
+import com.dvictor.twitter.models.User;
 import com.dvictor.twitter.util.InternetStatus;
 
 public class TimelineActivity extends FragmentActivity {
@@ -117,6 +114,18 @@ public class TimelineActivity extends FragmentActivity {
 		startActivityForResult(i, ACTIVITY_PROFILE);
 	}
 	
+	public void onProfileClick(View v){
+		// Get the user that they clicked on.
+		User u = (User) v.getTag(); // We stored the user object in TweetArrayAdapter when the image is created.
+		if(u==null){ // Error if not there.
+			Toast.makeText(this, "Image Missing User Info!", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		Intent i = new Intent(this,ProfileActivity.class);
+		i.putExtra("user", u);
+		startActivityForResult(i, ACTIVITY_PROFILE);
+	}
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
     	if(requestCode==ACTIVITY_CREATE){ // CreateActivity Result
