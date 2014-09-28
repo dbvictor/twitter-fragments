@@ -19,12 +19,15 @@ import android.widget.Toast;
 import com.dvictor.twitter.EndlessScrollListener;
 import com.dvictor.twitter.R;
 import com.dvictor.twitter.TweetArrayAdapter;
+import com.dvictor.twitter.TwitterApp;
+import com.dvictor.twitter.TwitterClient;
 import com.dvictor.twitter.models.Tweet;
 import com.dvictor.twitter.util.InternetStatus;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 abstract public class TweetsListFragment extends Fragment {
+	private TwitterClient      client;
 	private ArrayList<Tweet>   tweets;
 	private TweetArrayAdapter  aTweets;
 	private ListView		   lvTweets;
@@ -37,6 +40,7 @@ abstract public class TweetsListFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// Non-view initialization
+		client         = TwitterApp.getRestClient();
 		internetStatus = new InternetStatus(getActivity());
 		lastItemId     = 0; // Always start from 0.
 		tweets         = new ArrayList<Tweet>();
@@ -98,15 +102,21 @@ abstract public class TweetsListFragment extends Fragment {
 		setupEndlessScroll(); // Re-enable endless scrolling because if it hit end before, it would not try again.
 		if(tweets.size()==0) populateTimeline(true); // If no tweets so far, then the app just started and we have to re-run populate because it could have ran already and found no network.
 	}
+
 	
 	/** Delegate the adding to the internal adapter. */
-	public void addAll(List<Tweet> tweets){
-		aTweets.addAll(tweets);
-	}
+	//NOT NEEDED: public void addAll(List<Tweet> tweets){
+	//NOT NEEDED:	aTweets.addAll(tweets);
+	//NOT NEEDED:}
 	
 	/** Insert a new tweet at any position. */
 	public void insert(Tweet tweet, int position){
 		aTweets.insert(tweet, position);		
+	}
+	
+	/** Subclasses can get the TwitterClient instance. */
+	protected TwitterClient getClient(){
+		return client;
 	}
 	
     /** Populate the list with tweets. */
@@ -152,7 +162,7 @@ abstract public class TweetsListFragment extends Fragment {
 	/** Populate the timeline based on offline content. */
 	private void populateTimelineOffline(final boolean refresh){
 		List<Tweet> retrievedTweets = getOfflineTweets();
-		addAll(retrievedTweets);
+		aTweets.addAll(retrievedTweets);
 		lastItemId = tweets.get(tweets.size()-1).getUid(); // record the last item ID we've seen now, so we know where to continue off from next time.
 		Toast.makeText(getActivity(), "Offline Content: "+retrievedTweets.size(), Toast.LENGTH_SHORT).show();
         swipeContainer.setRefreshing(false);

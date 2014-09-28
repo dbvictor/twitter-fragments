@@ -40,6 +40,14 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(url, params, handler);
 	}
 
+	public void getMentionsTimeline(long lastItemId, AsyncHttpResponseHandler handler){
+		String url = getApiUrl("statuses/mentions_timeline.json");
+		RequestParams params = new RequestParams();
+		if(lastItemId>0) params.put("max_id",""+(lastItemId-1)); // Subtract 1 because max id will return results inclusive of that ID, and we only want the next older ones.  Use max & subtract because we are going for older IDs.
+		params.put("count","25");
+		client.get(url, params, handler);
+	}
+	
 	public void createTweet(String tweet, AsyncHttpResponseHandler handler){
 		String url = getApiUrl("statuses/update.json");
 		RequestParams params = new RequestParams();

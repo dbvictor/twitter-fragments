@@ -1,19 +1,31 @@
 package com.dvictor.twitter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.dvictor.twitter.fragments.HomeTimelineFragment;
+import com.dvictor.twitter.fragments.MentionsTimelineFragment;
 import com.dvictor.twitter.fragments.TweetsListFragment;
+import com.dvictor.twitter.listeners.FragmentTabListener;
 import com.dvictor.twitter.models.Tweet;
 import com.dvictor.twitter.util.InternetStatus;
 
 public class TimelineActivity extends FragmentActivity {
+	// Constants
+	private static final String FRAGMENTTAG_HOME     = "home";
+	private static final String FRAGMENTTAG_MENTIONS = "mentions";
 	// Member Variables
-	private TweetsListFragment fragmentTimeline;
 	private InternetStatus     internetStatus;
 	
 	@Override
@@ -21,8 +33,33 @@ public class TimelineActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_timeline);
 		internetStatus = new InternetStatus(this);
-		fragmentTimeline = (TweetsListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_timeline);
+		setupTabs();
 	}
+	
+	private void setupTabs() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(true);
+
+        Tab tab1 = actionBar
+            .newTab()
+            .setText("Home")
+            .setIcon(R.drawable.ic_home)
+            .setTag("HomeTimelineFragment")
+            .setTabListener(new FragmentTabListener<HomeTimelineFragment>(R.id.flContainer, this, FRAGMENTTAG_HOME, HomeTimelineFragment.class));
+
+        actionBar.addTab(tab1);
+        actionBar.selectTab(tab1);
+
+        Tab tab2 = actionBar
+            .newTab()
+            .setText("Mentions")
+            .setIcon(R.drawable.ic_mentions)
+            .setTag("MentionsTimelineFragment")
+            .setTabListener(new FragmentTabListener<MentionsTimelineFragment>(R.id.flContainer, this, FRAGMENTTAG_MENTIONS, MentionsTimelineFragment.class));
+
+        actionBar.addTab(tab2);
+    }
 	
 	// Inflate the menu; this adds items to the action bar if it is present.
 	@Override
@@ -39,7 +76,10 @@ public class TimelineActivity extends FragmentActivity {
 		setupInternetToggle(menuItem);
 		// If re-enabled, re-setup endless scroll & load data if if none loaded yet.
 		if(internetStatus.isAppToggleEnabled()){
-			fragmentTimeline.onInternetResume();
+			TweetsListFragment fHome     = (TweetsListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENTTAG_HOME    );
+			TweetsListFragment fMentions = (TweetsListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENTTAG_MENTIONS);
+			if(fHome    !=null) fHome    .onInternetResume();
+			if(fMentions!=null) fMentions.onInternetResume();
 		}
 	}
 
@@ -74,8 +114,11 @@ public class TimelineActivity extends FragmentActivity {
     		if(resultCode == RESULT_OK){
     			Tweet tweet = (Tweet) data.getSerializableExtra("tweet");
     			if(tweet!=null){
-    				fragmentTimeline.insert(tweet, 0);
-    				Toast.makeText(this, "Timeline Updated", Toast.LENGTH_SHORT).show();    				
+    				TweetsListFragment fragmentHome = (TweetsListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENTTAG_HOME);
+    				if(fragmentHome!=null){
+    					fragmentHome.insert(tweet, 0);
+    					Toast.makeText(this, "Timeline Updated", Toast.LENGTH_SHORT).show();
+    				}
     			}else Toast.makeText(this, "MISSING RESULT", Toast.LENGTH_SHORT).show();    				
     		}
     	}
