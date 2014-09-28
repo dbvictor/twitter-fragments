@@ -25,6 +25,8 @@ public class TimelineActivity extends FragmentActivity {
 	// Constants
 	private static final String FRAGMENTTAG_HOME     = "home";
 	private static final String FRAGMENTTAG_MENTIONS = "mentions";
+	private static final int    ACTIVITY_CREATE      = 1;
+	private static final int    ACTIVITY_PROFILE     = 2;
 	// Member Variables
 	private InternetStatus     internetStatus;
 	
@@ -104,13 +106,20 @@ public class TimelineActivity extends FragmentActivity {
 			//Toast.makeText(this, "Settings!", Toast.LENGTH_SHORT).show();
 			Intent i = new Intent(this,CreateActivity.class);
 			//no args: i.putExtra("settings", searchFilters);
-			startActivityForResult(i, 1);
+			startActivityForResult(i, ACTIVITY_CREATE);
 		}
+	}
+
+	/** Menu selection to view profile. */
+	public void viewProfile(MenuItem menuItem){
+		Intent i = new Intent(this,ProfileActivity.class);
+		//no args: i.putExtra("settings", searchFilters);
+		startActivityForResult(i, ACTIVITY_PROFILE);
 	}
 	
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-    	if(requestCode==1){ // CreateActivity Result
+    	if(requestCode==ACTIVITY_CREATE){ // CreateActivity Result
     		if(resultCode == RESULT_OK){
     			Tweet tweet = (Tweet) data.getSerializableExtra("tweet");
     			if(tweet!=null){

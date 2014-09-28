@@ -131,7 +131,7 @@ abstract public class TweetsListFragment extends Fragment {
 			getTweets(lastItemId, new JsonHttpResponseHandler(){
 				@Override
 				public void onSuccess(JSONArray json) {
-					Log.d("json", "Home Timeline JSON: "+json.toString());
+					Log.d("json", parentThis.getClass().getSimpleName()+" JSON: "+json.toString());
 					if(refresh) aTweets.clear(); // If told to refresh from beginning, clear existing results
 					ArrayList<Tweet> retrievedTweets = Tweet.fromJSON(json);
 					aTweets.addAll(retrievedTweets);
